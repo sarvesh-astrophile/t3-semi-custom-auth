@@ -12,9 +12,14 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
+import type { TRPCClientErrorLike } from "@trpc/client";
+import type { AppRouter } from "@/server/api/root";
 
 const formSchema = z
   .object({
+    name: z.string().min(3, "Name must be at least 3 characters"),
     email: z.string().email("Invalid email address"),
     password: z
       .string()
@@ -38,12 +43,28 @@ type FormData = z.infer<typeof formSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
-  // const { signIn: signInWithGoogle } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
+  // #1.1.1 Signup mutation
+  const signupMutation = api.user.signup.useMutation({
+    onSuccess: () => {
+      toast.success("Account created.", {
+        description:
+          "We've created your account for you. Please verify your email.",
+      });
+      router.push("/auth/verify-email");
+    },
+    onError: (err: TRPCClientErrorLike<AppRouter>) => {
+      setError(err.message || "An error occurred during sign up");
+      toast.error("Uh oh! Something went wrong.", {
+        description: err.message || "There was a problem with your request.",
+      });
+    },
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -54,22 +75,12 @@ export function SignUpForm() {
   const onSubmit = async (data: FormData) => {
     try {
       setError(null);
-      // const userCredential = await createUserWithEmailAndPassword(
-      //   auth,
-      //   data.email,
-      //   data.password
-      // );
-      // await sendEmailVerification(userCredential.user);
-
-      // Set up an observer for the email verification status
-      // const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      //   if (user?.emailVerified) {
-      //     unsubscribe(); // Clean up the observer
-      //     router.push("/dashboard");
-      //   } else if (user) {
-      //     router.push("/auth/verify-email");
-      //   }
-      // });
+      // #1.1.1 Signup mutation - updated
+      await signupMutation.mutateAsync({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An error occurred during sign up"
@@ -87,6 +98,22 @@ export function SignUpForm() {
       )}
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* #1.1.1 Signup form - updated */}
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Your Name"
+            {...form.register("name")}
+          />
+          {form.formState.errors.name && (
+            <p className="text-sm text-red-500">
+              {form.formState.errors.name.message}
+            </p>
+          )}
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -147,9 +174,9 @@ export function SignUpForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={form.formState.isSubmitting}
+          disabled={signupMutation.isPending || form.formState.isSubmitting} // #1.1.1 Signup mutation status
         >
-          {form.formState.isSubmitting
+          {signupMutation.isPending || form.formState.isSubmitting // #1.1.1 Signup mutation status
             ? "Creating account..."
             : "Create account"}
         </Button>
@@ -170,7 +197,7 @@ export function SignUpForm() {
         variant="outline"
         type="button"
         className="w-full"
-        // onClick={() => signInWithGoogle()}
+        disabled={true}
       >
         <svg
           className="mr-2 h-4 w-4"
