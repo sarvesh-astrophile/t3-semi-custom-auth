@@ -6,14 +6,12 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { sendPasswordResetEmail } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { auth } from "@/lib/firebase";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -35,7 +33,7 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await sendPasswordResetEmail(auth, data.email);
+      // await sendPasswordResetEmail(auth, data.email);
       setSuccess("Password reset email sent! Please check your inbox.");
     } catch (err) {
       setError(

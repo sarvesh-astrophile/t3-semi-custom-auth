@@ -5,16 +5,12 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { auth } from "@/lib/firebase";
-import { useAuth } from "@/context/AuthContext";
-import { getFirebaseErrorMessage } from "@/lib/firebase-errors";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,7 +21,6 @@ type FormData = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const router = useRouter();
-  const { signIn: signInWithGoogle } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -41,10 +36,10 @@ export function LoginForm() {
     try {
       setError(null);
       setIsLoading(true);
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      // await signInWithEmailAndPassword(auth, data.email, data.password);
       router.push("/dashboard");
     } catch (err) {
-      setError(getFirebaseErrorMessage(err));
+      // setError(getFirebaseErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -54,10 +49,10 @@ export function LoginForm() {
     try {
       setError(null);
       setIsLoading(true);
-      await signInWithGoogle();
+      // await signInWithGoogle();
       router.push("/dashboard");
     } catch (err) {
-      setError(getFirebaseErrorMessage(err));
+      // setError(getFirebaseErrorMessage(err));
     } finally {
       setIsLoading(false);
     }

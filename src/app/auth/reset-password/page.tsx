@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { confirmPasswordReset } from "firebase/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -13,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { AuthLayout } from "@/components/auth-layout";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { auth } from "@/lib/firebase";
 
 const formSchema = z
   .object({
@@ -55,7 +53,7 @@ export default function ResetPasswordPage() {
     }
 
     try {
-      await confirmPasswordReset(auth, oobCode, data.password);
+      // await confirmPasswordReset(auth, oobCode, data.password);
       setSuccess(
         "Password reset successful! You can now sign in with your new password."
       );

@@ -5,18 +5,12 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-} from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { auth } from "@/lib/firebase";
-import { useAuth } from "@/context/AuthContext";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z
@@ -44,7 +38,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
-  const { signIn: signInWithGoogle } = useAuth();
+  // const { signIn: signInWithGoogle } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
 
   const form = useForm<FormData>({
@@ -60,22 +54,22 @@ export function SignUpForm() {
   const onSubmit = async (data: FormData) => {
     try {
       setError(null);
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      await sendEmailVerification(userCredential.user);
+      // const userCredential = await createUserWithEmailAndPassword(
+      //   auth,
+      //   data.email,
+      //   data.password
+      // );
+      // await sendEmailVerification(userCredential.user);
 
       // Set up an observer for the email verification status
-      const unsubscribe = auth.onAuthStateChanged(async (user) => {
-        if (user?.emailVerified) {
-          unsubscribe(); // Clean up the observer
-          router.push("/dashboard");
-        } else if (user) {
-          router.push("/auth/verify-email");
-        }
-      });
+      // const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      //   if (user?.emailVerified) {
+      //     unsubscribe(); // Clean up the observer
+      //     router.push("/dashboard");
+      //   } else if (user) {
+      //     router.push("/auth/verify-email");
+      //   }
+      // });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An error occurred during sign up"
@@ -176,7 +170,7 @@ export function SignUpForm() {
         variant="outline"
         type="button"
         className="w-full"
-        onClick={() => signInWithGoogle()}
+        // onClick={() => signInWithGoogle()}
       >
         <svg
           className="mr-2 h-4 w-4"

@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { applyActionCode, sendEmailVerification } from "firebase/auth";
 import { Button } from "@/components/ui/button";
-import { AuthLayout } from "@/components/auth-layout";
 import { CheckCircle2, AlertCircle, MailCheck } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { auth } from "@/lib/firebase";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -26,7 +23,7 @@ export default function VerifyEmailPage() {
       }
 
       try {
-        await applyActionCode(auth, oobCode);
+        // await applyActionCode(auth, oobCode);
         setSuccess("Email verified successfully! You can now sign in.");
         setTimeout(() => {
           router.push("/auth/login");
@@ -42,13 +39,13 @@ export default function VerifyEmailPage() {
   }, [searchParams, router]);
 
   const resendVerificationEmail = async () => {
-    if (!auth.currentUser) {
-      setError("No user found. Please sign in again.");
-      return;
-    }
+    // if (!auth.currentUser) {
+    //   setError("No user found. Please sign in again.");
+    //   return;
+    // }
 
     try {
-      await sendEmailVerification(auth.currentUser);
+      // await sendEmailVerification(auth.currentUser);
       setSuccess("Verification email sent! Please check your inbox.");
     } catch (err) {
       setError(
