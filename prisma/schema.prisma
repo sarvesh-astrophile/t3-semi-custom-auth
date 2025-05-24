@@ -17,7 +17,7 @@ model User {
     name           String
     password_hash  String
     email_verified Boolean  @default(false)
-    recovery_code  String   @default("")
+    recovery_code  Bytes    @default("")
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 }

@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db"; // Assuming prisma client is exported as db from @/server/db
-import { hashPassword, verifyPasswordStrength } from "@/lib/encryption";
+import { hashPassword, verifyPasswordStrength } from "@/lib/auth/password";
 import { generateRandomRecoveryCode } from "@/lib/utils";
+import { encrypt, encryptString } from "@/lib/auth/encryption";
 // 1.1.1 User router - updated
 
 export const userRouter = createTRPCRouter({
@@ -32,12 +33,16 @@ export const userRouter = createTRPCRouter({
         );
       }
 
+      // Generate recovery code
+      const recoveryCode = generateRandomRecoveryCode();
+      const encryptedRecoveryCode = encryptString(recoveryCode);
+
       const user = await ctx.db.user.create({
         data: {
           email: input.email,
           name: input.name, // Changed from username to name
           password_hash: await hashPassword(input.password), // Hash password
-          recovery_code: generateRandomRecoveryCode(),
+          recovery_code: encryptedRecoveryCode,
         },
       });
 
