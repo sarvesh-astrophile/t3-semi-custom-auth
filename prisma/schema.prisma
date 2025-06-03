@@ -20,4 +20,18 @@ model User {
     recovery_code  Bytes    @default("")
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
+
+    emailVerificationRequest EmailVerificationRequest?
+}
+
+// #2.1.1 Email verification request model
+model EmailVerificationRequest {
+    id                String   @id @default(cuid())
+    user_id           String   @unique
+    email             String   @unique
+    verification_code Bytes    @default("")
+    expires_at        DateTime
+    createdAt         DateTime @default(now())
+
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

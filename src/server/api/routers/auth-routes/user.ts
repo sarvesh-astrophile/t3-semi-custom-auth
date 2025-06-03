@@ -34,14 +34,15 @@ export const userRouter = createTRPCRouter({
       }
 
       // Generate recovery code
+      const passwordHash = await hashPassword(input.password);
       const recoveryCode = generateRandomRecoveryCode();
       const encryptedRecoveryCode = encryptString(recoveryCode);
 
       const user = await ctx.db.user.create({
         data: {
           email: input.email,
-          name: input.name, // Changed from username to name
-          password_hash: await hashPassword(input.password), // Hash password
+          name: input.name, 
+          password_hash: passwordHash, 
           recovery_code: encryptedRecoveryCode,
         },
       });
