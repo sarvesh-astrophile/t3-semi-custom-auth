@@ -14,7 +14,6 @@ import { AlertCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
-import type { TRPCClientErrorLike } from "@trpc/client";
 import type { AppRouter } from "@/server/api/root";
 
 const formSchema = z
@@ -53,13 +52,25 @@ export function SignUpForm() {
           "We've created your account for you. Please verify your email.",
       });
     },
-    onError: (err: TRPCClientErrorLike<AppRouter>) => {
+    onError: (err) => {
       setError(err.message || "An error occurred during sign up");
       toast.error("Uh oh! Something went wrong.", {
         description: err.message || "There was a problem with your request.",
       });
     },
   });
+
+  const emailVerificationMutation =
+    api.emailVerification.createEmailVerificationRequest.useMutation({
+      onError: (err) => {
+        setError(err.message || "Could not send verification email.");
+        toast.error("Verification email failed", {
+          description:
+            err.message ||
+            "We could not send a verification email. Please try to resend it.",
+        });
+      },
+    });
 
   // # 2.1.1 create session
   const createSessionMutation = api.session.createSession.useMutation({
@@ -89,6 +100,10 @@ export function SignUpForm() {
         password: data.password,
       });
       // # 2.1.1 create session
+      await emailVerificationMutation.mutateAsync({
+        userId: user.id,
+        email: data.email,
+      });
       await createSessionMutation.mutateAsync({
         userId: user.id,
       });
@@ -185,9 +200,17 @@ export function SignUpForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={signupMutation.isPending || form.formState.isSubmitting} // #1.1.1 Signup mutation status
+          disabled={
+            signupMutation.isPending ||
+            emailVerificationMutation.isPending ||
+            createSessionMutation.isPending ||
+            form.formState.isSubmitting
+          }
         >
-          {signupMutation.isPending || form.formState.isSubmitting // #1.1.1 Signup mutation status
+          {signupMutation.isPending ||
+          emailVerificationMutation.isPending ||
+          createSessionMutation.isPending ||
+          form.formState.isSubmitting
             ? "Creating account..."
             : "Create account"}
         </Button>

@@ -1,87 +1,74 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, AlertCircle, MailCheck } from "lucide-react";
+import { MailCheck } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [verificationCode, setVerificationCode] = useState<string>("");
 
-  useEffect(() => {
-    const oobCodeFromUrl = searchParams.get("oobCode");
-    if (oobCodeFromUrl) {
-      setVerificationCode(oobCodeFromUrl);
-    }
-  }, [searchParams]);
+  const verifyEmailMutation = api.emailVerification.verifyEmail.useMutation();
 
-  const verifyEmailWithCode = async (code: string) => {
-    if (!code) {
-      setError("Please enter the verification code.");
+  const resendMutation =
+    api.emailVerification.resendVerificationEmail.useMutation();
+
+  const handleVerificationSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!verificationCode) {
+      toast.error("Please enter the verification code.");
       return;
     }
-    setLoading(true);
-    setError(null);
     setSuccess(null);
 
-    try {
-      console.log("Verifying with code:", code);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setSuccess("Email verified successfully! You can now sign in.");
-      setTimeout(() => {
-        router.push("/auth/login");
-      }, 3000);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to verify email. The code might be invalid or expired."
-      );
-    } finally {
-      setLoading(false);
-    }
+    toast.promise(verifyEmailMutation.mutateAsync({ code: verificationCode }), {
+      loading: "Verifying your code...",
+      success: () => {
+        setSuccess("Email verified successfully! You can now sign in.");
+        setTimeout(() => {
+          router.push("/auth/login");
+        }, 3000);
+        return "Email verified successfully! Redirecting to login...";
+      },
+      error: (err: unknown) => {
+        if (err instanceof Error) {
+          return err.message;
+        }
+        return "Failed to verify email. The code might be invalid or expired.";
+      },
+    });
   };
 
-  const handleVerificationSubmit = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-    await verifyEmailWithCode(verificationCode);
-  };
-
-  const resendVerificationEmail = async () => {
-    setLoading(true);
-    setError(null);
+  const resendVerificationEmail = () => {
     setSuccess(null);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSuccess(
-        "Verification email sent! Please check your inbox for a new code."
-      );
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to send verification email"
-      );
-    } finally {
-      setLoading(false);
-    }
+    toast.promise(resendMutation.mutateAsync(), {
+      loading: "Sending a new code...",
+      success: "A new verification code has been sent to your email.",
+      error: (err: unknown) => {
+        if (err instanceof Error) {
+          return err.message;
+        }
+        return "Failed to resend verification email.";
+      },
+    });
   };
+
+  const loading = verifyEmailMutation.isPending || resendMutation.isPending;
 
   if (success) {
     return (
       <div className="container flex h-screen w-screen flex-col items-center justify-center">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
           <Alert>
-            <MailCheck className="h-5 w-5 mr-2" />
+            <MailCheck className="mr-2 h-5 w-5" />
             <AlertDescription>{success}</AlertDescription>
           </Alert>
           <div className="text-center">
@@ -96,7 +83,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] p-6 rounded-lg shadow-none">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] rounded-lg p-6 shadow-none">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
             Verify Your Email
@@ -105,13 +92,6 @@ export default function VerifyEmailPage() {
             Enter the verification code sent to your email address.
           </p>
         </div>
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
 
         <form onSubmit={handleVerificationSubmit} className="space-y-4">
           <div className="grid w-full items-center gap-1.5">
@@ -135,7 +115,7 @@ export default function VerifyEmailPage() {
             className="w-full"
             disabled={loading || !verificationCode}
           >
-            {loading ? "Verifying..." : "Verify Email"}
+            {verifyEmailMutation.isPending ? "Verifying..." : "Verify Email"}
           </Button>
         </form>
 
@@ -145,9 +125,11 @@ export default function VerifyEmailPage() {
             variant="link"
             onClick={resendVerificationEmail}
             disabled={loading}
-            className="p-0 h-auto font-medium text-primary"
+            className="h-auto p-0 font-medium text-primary"
           >
-            Resend verification email
+            {resendMutation.isPending
+              ? "Sending..."
+              : "Resend verification email"}
           </Button>
         </div>
       </div>

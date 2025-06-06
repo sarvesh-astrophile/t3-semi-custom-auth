@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import { headers } from "next/headers";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -16,13 +18,17 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const headersList = await headers();
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider headers={headersList}>
+          {children}
+          <Toaster richColors theme="light" />
+        </TRPCReactProvider>
       </body>
     </html>
   );

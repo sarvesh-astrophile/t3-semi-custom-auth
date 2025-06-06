@@ -3,6 +3,7 @@ import { sha256 } from "@oslojs/crypto/sha2";
 import { db } from "@/server/db";
 import { cookies } from "next/headers";
 import { env } from "@/env";
+import { cache } from "react";
 
 // #1.5.1 SessionFlags
 export interface SessionFlags {
@@ -119,3 +120,15 @@ export async function validateSession(token: string) {
     return { user, session };
 }
 
+export const getCurrentUserSession = cache(async () => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("session");
+    if (!token) {
+        return null;
+    }
+    const session = await validateSession(token.value);
+    if (!session) {
+        return null;
+    }
+    return session;
+});

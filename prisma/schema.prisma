@@ -34,7 +34,7 @@ model EmailVerificationRequest {
     id                String   @id @default(cuid())
     user_id           String   @unique
     email             String   @unique
-    verification_code Bytes    @default("")
+    verification_code String
     expires_at        DateTime
     createdAt         DateTime @default(now())
 

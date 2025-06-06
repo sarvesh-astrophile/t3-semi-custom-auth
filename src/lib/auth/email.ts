@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { env } from "@/env";
+import { getCurrentUserSession } from "./session-utlis";
+import { db } from "@/server/db";
 
 // 2.1.2 send email verification code start with console log
 export async function sendEmailVerificationCode(email: string, code: string) {
@@ -26,4 +28,29 @@ cookieStore.set("emailVerification", "", {
   secure: env.NODE_ENV === "production", 
   sameSite: "lax", 
   maxAge: 0});
+}
+
+export async function getCurrentUserEmailVerificationRequest() {
+  const userSession = await getCurrentUserSession();
+  if(!userSession) {
+    return null;
+  }
+  const cookieStore = await cookies();
+  const emailVerification = cookieStore.get("emailVerification");
+  if (!emailVerification) {
+    return null;
+  }
+  const emailVerificationRequest = await db.emailVerificationRequest.findFirst({
+    where: {
+      id: emailVerification.value,
+      user_id: userSession.user?.id,
+    }
+  });
+  if(!emailVerificationRequest) {
+    return null;
+  }
+  if(emailVerificationRequest.expires_at < new Date()) {
+    return null;
+  }
+  return emailVerificationRequest;
 }

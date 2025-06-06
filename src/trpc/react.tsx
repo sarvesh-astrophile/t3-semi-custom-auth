@@ -61,7 +61,9 @@ export function TRPCReactProvider(props: {
           // #2.1.1
           condition(op) {
             return (
-              op.path.startsWith("auth.") || op.path.startsWith("session.")
+              op.path.startsWith("auth.") ||
+              op.path.startsWith("session.") ||
+              op.path.startsWith("emailVerification.")
             );
           },
           true: httpBatchLink({

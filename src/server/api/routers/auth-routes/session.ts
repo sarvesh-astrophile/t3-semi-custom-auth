@@ -9,6 +9,7 @@ import {
     deleteSessionTokenCookie,
     invalidateUsersSessions as utilInvalidateUsersSessions,
     setSessionAs2FAVerified as utilSetSessionAs2FAVerified,
+    getCurrentUserSession,
 } from "@/lib/auth/session-utlis";
 import { TRPCError } from "@trpc/server";
 import { sha256 } from "@oslojs/crypto/sha2";
@@ -37,17 +38,11 @@ export const sessionRouter = createTRPCRouter({
         }),
 
     getSession: publicProcedure.query(async () => {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("session")?.value;
-        if (!token) {
+        const session = await getCurrentUserSession();
+        if (!session) {
             return null;
         }
-        const validated = await utilValidateSession(token);
-        if (!validated || !validated.session || !validated.user) {
-            await deleteSessionTokenCookie();
-            return null;
-        }
-        return validated;
+        return session;
     }),
 
     deleteSession: publicProcedure.mutation(async () => {
