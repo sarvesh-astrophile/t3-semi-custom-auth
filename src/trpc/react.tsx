@@ -60,7 +60,9 @@ export function TRPCReactProvider(props: {
         splitLink({
           // #2.1.1
           condition(op) {
-            return op.path.startsWith("auth.");
+            return (
+              op.path.startsWith("auth.") || op.path.startsWith("session.")
+            );
           },
           true: httpBatchLink({
             url: `${getBaseUrl()}/api/trpc`,

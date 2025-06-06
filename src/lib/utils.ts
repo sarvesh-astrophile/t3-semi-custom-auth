@@ -14,3 +14,10 @@ export function generateRandomRecoveryCode(): string {
   return recoveryCode;
 }
 
+// 2.1.1 generate random code for email verification
+export function generateRandomCode(): string {
+  const codeBytes = new Uint8Array(5);
+  crypto.getRandomValues(codeBytes);
+  const code = encodeBase32UpperCaseNoPadding(codeBytes);
+  return code;
+}

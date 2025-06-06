@@ -47,17 +47,24 @@ export function SignUpForm() {
   // #1.1.1 Signup mutation
   const signupMutation = api.user.signup.useMutation({
     onSuccess: () => {
+      // # 2.1.1 Email verification
       toast.success("Account created.", {
         description:
           "We've created your account for you. Please verify your email.",
       });
-      router.push("/auth/verify-email");
     },
     onError: (err: TRPCClientErrorLike<AppRouter>) => {
       setError(err.message || "An error occurred during sign up");
       toast.error("Uh oh! Something went wrong.", {
         description: err.message || "There was a problem with your request.",
       });
+    },
+  });
+
+  // # 2.1.1 create session
+  const createSessionMutation = api.session.createSession.useMutation({
+    onSuccess: () => {
+      router.push("/auth/verify-email");
     },
   });
 
@@ -76,10 +83,14 @@ export function SignUpForm() {
     try {
       setError(null);
       // #1.1.1 Signup mutation - updated
-      await signupMutation.mutateAsync({
+      const user = await signupMutation.mutateAsync({
         name: data.name,
         email: data.email,
         password: data.password,
+      });
+      // # 2.1.1 create session
+      await createSessionMutation.mutateAsync({
+        userId: user.id,
       });
     } catch (err) {
       setError(

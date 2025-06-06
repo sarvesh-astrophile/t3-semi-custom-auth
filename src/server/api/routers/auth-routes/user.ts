@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { db } from "@/server/db"; // Assuming prisma client is exported as db from @/server/db
 import { hashPassword, verifyPasswordStrength } from "@/lib/auth/password";
 import { generateRandomRecoveryCode } from "@/lib/utils";
 import { encrypt, encryptString } from "@/lib/auth/encryption";
@@ -21,7 +20,7 @@ export const userRouter = createTRPCRouter({
         where: { email: input.email },
       });
       if (existingUserByEmail) {
-        throw new Error("Email already in use."); // Or use TRPCError
+        throw new Error("Email already exists."); // Or use TRPCError
       }
       // Removed check for existing username as name is not unique
 

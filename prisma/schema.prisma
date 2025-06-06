@@ -12,16 +12,21 @@ datasource db {
 
 // #1.1.1 User model
 model User {
-    id             String   @id @default(cuid())
-    email          String   @unique
-    name           String
-    password_hash  String
-    email_verified Boolean  @default(false)
-    recovery_code  Bytes    @default("")
-    createdAt      DateTime @default(now())
-    updatedAt      DateTime @updatedAt
+    id                      String   @id @default(cuid())
+    email                   String   @unique
+    name                    String
+    password_hash           String
+    email_verified          Boolean  @default(false)
+    registered_2FA          Boolean  @default(false)
+    registered_totp         Boolean  @default(false)
+    registered_passkey      Boolean  @default(false)
+    registered_security_key Boolean  @default(false)
+    recovery_code           Bytes    @default("")
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @updatedAt
 
     emailVerificationRequest EmailVerificationRequest?
+    session                  Session?
 }
 
 // #2.1.1 Email verification request model
@@ -32,6 +37,17 @@ model EmailVerificationRequest {
     verification_code Bytes    @default("")
     expires_at        DateTime
     createdAt         DateTime @default(now())
+
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+// #1.5.1 Session model
+model Session {
+    id                  String   @id @default(cuid())
+    user_id             String   @unique
+    two_factor_verified Boolean  @default(false)
+    expires_at          DateTime
+    createdAt           DateTime @default(now())
 
     user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
