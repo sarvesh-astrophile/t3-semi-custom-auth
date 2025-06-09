@@ -88,9 +88,7 @@ export default function ForgotPasswordPage() {
             className="w-full"
             disabled={form.formState.isSubmitting}
           >
-            {form.formState.isSubmitting
-              ? "Sending reset link..."
-              : "Send reset link"}
+            {form.formState.isSubmitting ? "Sending OTP..." : "Send OTP"}
           </Button>
         </form>
 

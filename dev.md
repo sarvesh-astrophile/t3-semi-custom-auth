@@ -2,28 +2,28 @@ Okay, I've analyzed the files you provided. To create a tutorial for beginners o
 
 1.  **User Authentication & Session Management:**
 
-    - **User Signup:** Creating new user accounts (`lib/server/user.ts`, `lib/server/password.ts`). This involves:
-      ~~- Input validation for username and email (`lib/server/user.ts`, `lib/server/email.ts`).~~
-      ~~- Hashing user passwords securely (`lib/server/password.ts`).~~
-      ~~- Storing user data (`lib/server/db.ts`, `lib/server/user.ts`).~~
-      ~~- Generating an initial recovery code (`lib/server/user.ts`, `lib/server/utils.ts`).~~
-    - **User Login:** Authenticating existing users (`lib/server/user.ts`, `lib/server/password.ts`, `lib/server/session.ts`). This includes:
-      - Verifying credentials against stored hashes.
-      - Creating and managing user sessions (`lib/server/session.ts`).
-      - Handling session tokens and cookies.
-    - **Logout:** Invalidating user sessions (`lib/server/session.ts`).
-      ~~- **Session Persistence & Validation:** Ensuring users remain logged in across requests and validating session tokens (`lib/server/session.ts`).~~
+    - ~~**User Signup:** Creating new user accounts (`lib/server/user.ts`, `lib/server/password.ts`). This involves:~~
+      - ~~Input validation for username and email (`lib/server/user.ts`, `lib/server/email.ts`).~~
+      - ~~Hashing user passwords securely (`lib/server/password.ts`).~~
+      - ~~Storing user data (`lib/server/db.ts`, `lib/server/user.ts`).~~
+      - ~~Generating an initial recovery code (`lib/server/user.ts`, `lib/server/utils.ts`).~~
+    - ~~**User Login:** Authenticating existing users (`lib/server/user.ts`, `lib/server/password.ts`, `lib/server/session.ts`). This includes:~~
+      - ~~Verifying credentials against stored hashes.~~
+      - ~~Creating and managing user sessions (`lib/server/session.ts`).~~
+      - ~~Handling session tokens and cookies.~~
+    - ~~**Logout:** Invalidating user sessions (`lib/server/session.ts`).~~
+    - ~~**Session Persistence & Validation:** Ensuring users remain logged in across requests and validating session tokens (`lib/server/session.ts`).~~
 
 2.  **Email Verification:**
 
     - Generating and sending verification codes/links to users (`lib/server/email-verification.ts`, `lib/server/utils.ts`).
-    - Verifying the code provided by the user.
-    - Updating user status to "email verified" (`lib/server/user.ts`, `lib/server/email-verification.ts`).
-    - Managing email verification requests and cookies (`lib/server/email-verification.ts`).
+    - ~~Verifying the code provided by the user.~~
+    - ~~Updating user status to "email verified" (`lib/server/user.ts`, `lib/server/email-verification.ts`).~~
+    - ~~Managing email verification requests and cookies (`lib/server/email-verification.ts`).~~
 
 3.  **Password Management:**
 
-    - **Password Strength Checking:** Ensuring users choose strong passwords (`lib/server/password.ts`).
+    - ~~**Password Strength Checking:** Ensuring users choose strong passwords (`lib/server/password.ts`).~~
     - **Forgot Password & Reset:**
       - Initiating the password reset process (`lib/server/password-reset.ts`).
       - Sending password reset codes/links via email.

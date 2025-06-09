@@ -6,6 +6,7 @@ import { Geist } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/react";
 import { headers } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
+import { StagewiseToolbar } from "@stagewise/toolbar-next";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -18,6 +19,10 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
+const stagewiseConfig = {
+  plugins: [],
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -29,6 +34,9 @@ export default async function RootLayout({
           {children}
           <Toaster richColors theme="light" />
         </TRPCReactProvider>
+        {process.env.NODE_ENV === "development" && (
+          <StagewiseToolbar config={stagewiseConfig} />
+        )}
       </body>
     </html>
   );
