@@ -3,6 +3,7 @@
 
 generator client {
     provider = "prisma-client-js"
+    output   = "../src/generated/client"
 }
 
 datasource db {
@@ -27,6 +28,7 @@ model User {
 
     emailVerificationRequest EmailVerificationRequest?
     session                  Session?
+    totp_credentials         TOTPCredentials?
 }
 
 // #2.1.1 Email verification request model
@@ -48,6 +50,16 @@ model Session {
     two_factor_verified Boolean  @default(false)
     expires_at          DateTime
     createdAt           DateTime @default(now())
+
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+// #4.1.3 totp credentials model
+model TOTPCredentials {
+    id                String   @id @default(cuid())
+    user_id           String   @unique
+    totp_key          String
+    createdAt         DateTime @default(now())
 
     user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

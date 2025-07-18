@@ -10,19 +10,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const router = useRouter();
-  const [error, setError] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+
+  const loginMutation = api.user.login.useMutation({
+    onSuccess: (data) => {
+      if (data.twoFactorRequired) {
+        router.push("/auth/2fa/totp");
+      } else {
+        toast.success("Login successful!");
+        router.push("/");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -33,40 +47,33 @@ export function LoginForm() {
   });
 
   const onSubmit = async (data: FormData) => {
-    try {
-      setError(null);
-      setIsLoading(true);
-      // await signInWithEmailAndPassword(auth, data.email, data.password);
-      router.push("/dashboard");
-    } catch (err) {
-      // setError(getFirebaseErrorMessage(err));
-    } finally {
-      setIsLoading(false);
+    console.log("Form submission data:", data);
+    
+    // Check for form validation errors
+    if (form.formState.errors.email || form.formState.errors.password) {
+      toast.error("Please fix the validation errors");
+      return;
     }
+    
+    if (!data.email || !data.password) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    loginMutation.mutate(data);
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      setError(null);
-      setIsLoading(true);
-      // await signInWithGoogle();
-      router.push("/dashboard");
+      // TODO: Implement Google sign-in
+      toast.info("Google sign-in not implemented yet");
     } catch (err) {
-      // setError(getFirebaseErrorMessage(err));
-    } finally {
-      setIsLoading(false);
+      toast.error("Google sign-in failed");
     }
   };
 
   return (
     <div className="grid gap-6">
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
@@ -75,7 +82,7 @@ export function LoginForm() {
             type="email"
             placeholder="name@example.com"
             {...form.register("email")}
-            disabled={isLoading}
+            disabled={loginMutation.isPending}
           />
           {form.formState.errors.email && (
             <p className="text-sm text-red-500">
@@ -90,7 +97,7 @@ export function LoginForm() {
             id="password"
             type="password"
             {...form.register("password")}
-            disabled={isLoading}
+            disabled={loginMutation.isPending}
           />
           {form.formState.errors.password && (
             <p className="text-sm text-red-500">
@@ -99,8 +106,11 @@ export function LoginForm() {
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign in"}
+        <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+          {loginMutation.isPending && (
+            <Loader2 className="mr-2 size-4 animate-spin" />
+          )}
+          {loginMutation.isPending ? "Signing in..." : "Sign in"}
         </Button>
       </form>
 
@@ -120,7 +130,7 @@ export function LoginForm() {
         type="button"
         className="w-full"
         onClick={handleGoogleSignIn}
-        disabled={isLoading}
+        disabled={loginMutation.isPending}
       >
         <svg
           className="mr-2 h-4 w-4"

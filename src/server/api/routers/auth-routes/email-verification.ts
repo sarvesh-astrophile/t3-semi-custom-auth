@@ -4,7 +4,7 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { generateRandomCode } from "@/lib/utils";
 import { sendEmailVerificationCode, setEmailVerificationCookie, deleteEmailVerificationCookie } from "@/lib/auth/email";
 import { TRPCError } from "@trpc/server";
-import { getCurrentUserSession } from "@/lib/auth/session-utlis";
+import { getCurrentUserSession } from "@/lib/auth/session-utils";
 import { cookies } from "next/headers";
 
 export const emailVerificationRouter = createTRPCRouter({

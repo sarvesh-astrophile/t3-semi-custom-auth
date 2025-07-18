@@ -26,6 +26,7 @@
 		"@hookform/resolvers": "^5.1.1",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
+		"@oslojs/otp": "^1.1.0",
 		"@prisma/client": "^6.5.0",
 		"@radix-ui/react-accordion": "^1.2.11",
 		"@radix-ui/react-alert-dialog": "^1.1.14",
@@ -80,6 +81,7 @@
 		"sonner": "^2.0.5",
 		"superjson": "^2.2.1",
 		"tailwind-merge": "^3.3.0",
+		"uqr": "^0.1.2",
 		"vaul": "^1.1.2",
 		"zod": "^3.25.56"
 	},

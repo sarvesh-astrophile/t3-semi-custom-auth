@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { env } from "@/env";
-import { getCurrentUserSession } from "./session-utlis";
+import { getCurrentUserSession } from "./session-utils";
 import { db } from "@/server/db";
 
 // 2.1.2 send email verification code start with console log

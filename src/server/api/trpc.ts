@@ -104,3 +104,23 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+import { getCurrentUserSession } from "@/lib/auth/session-utils";
+import { TRPCError } from "@trpc/server";
+
+const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+    const session = await getCurrentUserSession();
+    if (!session || !session.user || !session.session) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    return next({
+        ctx: {
+            ...ctx,
+            session: session.session,
+            user: session.user,
+        },
+    });
+});
+
+export const protectedProcedure = t.procedure.use(enforceUserIsAuthed).use(timingMiddleware);

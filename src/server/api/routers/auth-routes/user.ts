@@ -1,11 +1,81 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { hashPassword, verifyPasswordStrength } from "@/lib/auth/password";
+import { hashPassword, verifyPasswordStrength, verifyPasswordHash } from "@/lib/auth/password";
 import { generateRandomRecoveryCode } from "@/lib/utils";
 import { encrypt, encryptString } from "@/lib/auth/encryption";
+import { 
+  generateSessionToken, 
+  createSession, 
+  setSessionTokenCookie,
+  invalidateUsersSessions
+} from "@/lib/auth/session-utils";
+import { TRPCError } from "@trpc/server";
 // 1.1.1 User router - updated
 
 export const userRouter = createTRPCRouter({
+  login: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string().min(1, "Password is required"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Validate input
+      if (!input.email || !input.password) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Email and password are required.",
+        });
+      }
+
+      // Find user by email
+      const user = await ctx.db.user.findUnique({
+        where: { email: input.email },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid email or password.",
+        });
+      }
+
+      // Verify password
+      const isPasswordValid = await verifyPasswordHash(input.password, user.password_hash);
+      if (!isPasswordValid) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid email or password.",
+        });
+      }
+
+      // Invalidate any existing sessions for this user
+      await invalidateUsersSessions(user.id);
+
+      // Check if user has 2FA enabled
+      const has2FA = user.registered_2FA && user.registered_totp;
+
+      // Generate session token
+      const token = generateSessionToken();
+      
+      if (has2FA) {
+        // Create session with 2FA not verified
+        const sessionFlags = { twoFactorVerified: false };
+        const newSession = await createSession(token, user.id, sessionFlags);
+        await setSessionTokenCookie(token, newSession.expires_at);
+        
+        return { twoFactorRequired: true };
+      } else {
+        // Create session with 2FA verified (no 2FA required)
+        const sessionFlags = { twoFactorVerified: true };
+        const newSession = await createSession(token, user.id, sessionFlags);
+        await setSessionTokenCookie(token, newSession.expires_at);
+        
+        return { twoFactorRequired: false };
+      }
+    }),
+
   signup: publicProcedure
     .input(
       z.object({

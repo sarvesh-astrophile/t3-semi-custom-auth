@@ -22,7 +22,7 @@ You also use the latest versions of Bun, Nextjs 15 App route, tRPC, Next AI SDK,
 /pro = "use the Project management MCP, Three types of tool : project, labels [to label task (here it is called issues)] modules and  Issues (task or subtask if has parent)"
 /think = "think thought the problem and tell in chat how you will solve it"
 /file = "solve all problem in this file"
-/en = "enhance the prompt in format
+/enhance = "enhance the prompt in format
 **objective**: eg: Write a Python function to sort a list of dictionaries by a given key , **context**: eg: I’m working in ./utils.py and need this for a data processing script, **instructions**: eg: '- Create a function called `sort_by_key(data, key)` that takes a list of dictionaries and a key string.- Use Python’s sorted() with a lambda function. - Add docstring with an example.' ,**verfication**: 'Test it with `data = [{'name': 'Bob', 'age': 25}, {'name': 'Alice', 'age': 30}]` and key='age', ensuring output is sorted ascending' and **prefrences**: eg: 'Write the code directly in ./utils.py' ; only answer this in final use whole codebase; do not code"
 
 ----

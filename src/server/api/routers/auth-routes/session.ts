@@ -10,7 +10,7 @@ import {
     invalidateUsersSessions as utilInvalidateUsersSessions,
     setSessionAs2FAVerified as utilSetSessionAs2FAVerified,
     getCurrentUserSession,
-} from "@/lib/auth/session-utlis";
+} from "@/lib/auth/session-utils";
 import { TRPCError } from "@trpc/server";
 import { sha256 } from "@oslojs/crypto/sha2";
 import { encodeHexLowerCase } from "@oslojs/encoding";
