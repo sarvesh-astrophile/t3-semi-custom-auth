@@ -38,10 +38,10 @@ Okay, I've analyzed the files you provided. To create a tutorial for beginners o
       - Generating and displaying recovery codes for users to store securely (`lib/server/user.ts`, `lib/server/utils.ts`).
       - Allowing users to use a recovery code to regain access if they lose their 2FA device (`lib/server/2fa.ts`).
       - Resetting 2FA methods using a recovery code.
-    - **Time-based One-Time Password (TOTP):** (`lib/server/totp.ts`)
-      - Setting up TOTP with an authenticator app (generating a secret key, displaying a QR code).
-      - Verifying TOTP codes during login or sensitive actions.
-      - Storing encrypted TOTP keys (`lib/server/encryption.ts`).
+    - ~~**Time-based One-Time Password (TOTP):** (`lib/server/totp.ts`)~~
+      - ~~Setting up TOTP with an authenticator app (generating a secret key, displaying a QR code).~~
+      - ~~Verifying TOTP codes during login or sensitive actions.~~
+      - ~~Storing encrypted TOTP keys (`lib/server/encryption.ts`).~~
     - **WebAuthn (Passkeys & Security Keys):** (`lib/server/webauthn.ts`)
       - **Passkey Registration:** Allowing users to register device-bound passkeys.
       - **Security Key Registration:** Allowing users to register hardware security keys.

@@ -9,6 +9,7 @@ import {
   setSessionTokenCookie,
   invalidateUsersSessions
 } from "@/lib/auth/session-utils";
+import { encodeBase64 } from "@oslojs/encoding";
 import { TRPCError } from "@trpc/server";
 // 1.1.1 User router - updated
 
@@ -106,13 +107,14 @@ export const userRouter = createTRPCRouter({
       const passwordHash = await hashPassword(input.password);
       const recoveryCode = generateRandomRecoveryCode();
       const encryptedRecoveryCode = encryptString(recoveryCode);
+      const recoveryCodeString = encodeBase64(encryptedRecoveryCode);
 
       const user = await ctx.db.user.create({
         data: {
           email: input.email,
           name: input.name, 
           password_hash: passwordHash, 
-          recovery_code: encryptedRecoveryCode,
+          recovery_code: recoveryCodeString,
         },
       });
 

@@ -37,3 +37,9 @@ export function decryptString(encrypted: Uint8Array): string {
   return new TextDecoder().decode(decrypt(encrypted));
 }
 
+// Helper functions for handling base64-encoded encrypted data
+export function decryptFromBase64String(base64String: string): string {
+  const encryptedData = decodeBase64(base64String);
+  return decryptString(encryptedData);
+}
+

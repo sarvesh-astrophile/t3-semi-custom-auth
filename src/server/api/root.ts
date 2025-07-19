@@ -3,6 +3,7 @@ import { userRouter } from "./routers/auth-routes/user";
 import { emailVerificationRouter } from "./routers/auth-routes/email-verification";
 import { sessionRouter } from "./routers/auth-routes/session";
 import { totpRouter } from "./routers/auth-routes/totp";
+import { passkeyRouter } from "./routers/auth-routes/passkey";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
 	emailVerification: emailVerificationRouter,
 	session: sessionRouter,
 	totp: totpRouter,
+	passkey: passkeyRouter,	
 });
 
 // export type definition of API
